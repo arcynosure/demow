@@ -1,0 +1,39 @@
+<form action="/transactioncomplete" method="post">
+    <div class="row">
+        <span class="col-md-2">From:</span>
+        <div class="col-md-4">
+            <input type="text" name="fromAccount" class="form-control" value="<%= address %>" readonly/>
+        </div>
+    </div>
+    <br/>
+
+    <div class="row">
+        <span class="col-md-2">To:</span>
+        <div class="col-md-4">
+            <input type="text" name="toAccount" class="form-control" required/>
+        </div>
+    </div>
+    <br/>
+
+    <div class="row">
+        <span class="col-md-2">Amount:</span>
+        <div class="col-md-4">
+            <input type="text" name="amounts" class="form-control" required/>
+        </div>
+    </div>
+    <br/>
+
+    <button type="submit" id="btnSend" class="btn btn-primary">Send</button>
+    <br/><br/>
+    <div id="alert" class="alert alert-danger" style="display: none" role="alert"><strong>Oh snap!</strong> Your balance not enough</div>
+
+    <img id="loading" src="img/loading.gif" style="display: none"/>
+
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        var id = urlParams.get('balance');
+        if(id){
+            document.write('<div class="alert alert-danger" id="alert" role="alert"><p> <strong>Oh snap!</strong> '+ id +'</p></div>')
+        }
+    </script>
+</form>

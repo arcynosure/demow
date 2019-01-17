@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Idealink</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/jquery.qrcode.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" id="home" href="/dashboard">Idealink</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="/dashboard" id="home">Home</a></li>
+            <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Account <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="/checkbalance" id="check">Check Balance</a></li>
+                    <li><a href="/sendtransaction" id="send">Send Transaction</a></li>
+                    <li><a href="/" id="restore">Restore Account</a></li>
+                </ul>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="#"><span class="glyphicon glyphicon-user"></span> <%= message %></a></li>
+            <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container" id="includedContent">
+
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        getContent('/home');
+
+        $('body').delegate('#home','click',function(e){
+            e.preventDefault();
+            getContent('/home');
+        });
+
+        $('body').delegate('#check','click',function(e){
+            e.preventDefault();
+            let url = '/checkbalance';
+            getContent(url);
+        });
+
+        $('body').delegate('#send','click',function(e){
+            e.preventDefault();
+
+            let url = '/sendtransaction';
+            getContent(url);
+        });
+
+        $('body').delegate('#btnSend','click',function(e) {
+            $('#loading').css('display','block');
+            e.preventDefault();
+
+            let toAccount = $('input[name=toAccount]').val();
+            let amounts = $('input[name=amounts]').val();
+
+            $.ajax({
+                async: false,
+                url: '/transactioncomplete',
+                type: 'POST',
+                data: {toAccount: toAccount, amounts: amounts},
+                success: function(data) {
+                    if (data.amount === 'false') {
+                        $('#alert').css('display','block');
+                        $('#loading').css('display','none');
+                    }
+                    else if (data.trnx === 'success') {
+                        location.reload();
+                    }
+                }
+            });
+        });
+
+        $('body').delegate('#restore','click',function(e){
+            e.preventDefault();
+
+            let url = '/restore';
+            getContent(url);
+        });
+
+        $('body').delegate('#restore-page','click',function(e) {
+            e.preventDefault();
+
+            let mnemonic = $('#mnemonic').val();
+
+            $.ajax({
+                url: '/sendrestore',
+                type: 'POST',
+                async: false,
+                data: { mnemonic: mnemonic },
+                success: function(data) {
+                    if (data) {
+                        $('#label').css('display','block');
+                        $('#privateKey').qrcode({ width: 150, height: 150, text: data.privateKey });
+                    }
+                }
+            });
+        });
+    });
+
+    function getContent(url) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(data){
+                $('#includedContent').html(data);
+            }
+        });
+    }
+</script>
+</body>
+</html>
